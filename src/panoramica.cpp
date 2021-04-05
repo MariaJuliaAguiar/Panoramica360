@@ -98,7 +98,7 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 					}
 				}
 
-				vector<Point>pts_cols, points;
+				/*vector<Point>pts_cols, points;
 				for (int i = val.second->x / 2; i < val.second->x; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
@@ -110,22 +110,8 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 							pts_cols.push_back(p);
 						}
 					}
-				}
-				//Encontrando min e max em x e y
-				auto valH = minmax_element(pts_cols.begin(), pts_cols.end(), findMinMaxcols);
-				auto valVert = minmax_element(pts_cols.begin(), pts_cols.end(), findMinMaxRows);
+				}*/
 
-				int size1 = abs(valH.first->x - valH.second->x);
-#pragma omp parallel for
-				for (int i = valH.first->x; i < valH.first->x; i++)
-				{
-					for (int j = 0; j < img.rows; j++)
-					{
-						Vec3b color1(0, 0, 0);
-						img.at< Vec3b>(Point(i, j)) = color1;
-
-					}
-				}
 			}
 			else
 			{
@@ -181,7 +167,7 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 
 				int size1 = abs(valH.first->x - valH.second->x);
 #pragma omp parallel for
-				for (int i = valH.first->x; i < valH.first->x + 450; i++)
+				for (int i = valH.first->x; i < valH.first->x + 350; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
@@ -203,9 +189,9 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 			}
 			else
 			{
-				
+
 #pragma omp parallel for
-				for (int i = val.first->x; i < val.first->x + 200; i++)
+				for (int i = val.first->x; i < val.first->x + 250; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
@@ -215,7 +201,7 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 					}
 				}
 #pragma omp parallel for
-				for (int i = val.second->x - 200; i < val.second->x; i++)
+				for (int i = val.second->x - 250; i < val.second->x; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
@@ -226,17 +212,7 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 				}
 			}
 
-			//#pragma omp parallel for
-			//			for (int i = valH.second->x -300; i < valH.second->x; i++)
-			//			{
-			//				for (int j = 0; j < img.rows; j++)
-			//				{
-			//
-			//					Vec3b color1(0, 0, 0);
-			//					img.at< Vec3b>(Point(i, j)) = color1;
-			//
-			//				}
-			//			}
+
 		}
 
 		//Caso contrario tira pedaço dos dois extremos para não aparecer as bordas no blending
@@ -246,13 +222,11 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 	if (k != qnt_images_linha - 1 && k != 1000 && k != qnt_images_linha - 2)
 	{
 
-		
-					//Extremos de imagens
-		vector<Point>pts_Teste, points;
-		if (val.first->x == 0 && val.second->x == img.cols - 1)
-		{
+		if (k != qnt_images_linha - 3 && val.first->x == 0 && val.second->x == img.cols - 1) {
+
+
 #pragma omp parallel for
-			for (int i = val.first->x; i < img.cols / 2; i++)
+			for (int i = val.first->x + 500; i < img.cols / 2; i++)
 			{
 				for (int j = 0; j < img.rows; j++)
 				{
@@ -265,94 +239,91 @@ Mat createMask(Mat img, vector<vector<Point>> contours, int k, int qnt_images_li
 			}
 
 
-			vector<Point>pts_cols, points;
-			for (int i = val.second->x / 2; i < val.second->x; i++)
-			{
-				for (int j = 0; j < img.rows; j++)
-				{
-					if (img.at< Vec3b>(Point(i, j))[0] != 0 && img.at< Vec3b>(Point(i, j))[1] != 0 && img.at< Vec3b>(Point(i, j))[2] != 0) {
-						Point p;
-						p.x = i; p.y = j;
-						pts_cols.push_back(p);
-					}
-				}
-			}
-			//Enocntrando min e max em x e y
-			auto val1 = minmax_element(pts_cols.begin(), pts_cols.end(), findMinMaxcols);
-			auto val2 = minmax_element(pts_cols.begin(), pts_cols.end(), findMinMaxRows);
-			int size2 = abs(val2.first->x - val1.first->x);
-			//#pragma omp parallel for
-			//			for (int i = val1.first->x; i < val1.first->x + size2/2; i++)
-			//			{
-			//				for (int j = 0; j < img.rows; j++)
-			//				{
-			//
-			//					Vec3b color1(0, 0, 0);
-			//					img.at< Vec3b>(Point(i, j)) = color1;
-			//
-			//				}
-			//			}
-						/*for (int i = val1.first->x + 30; i < val1.second->x; i++)
-						{
-							for (int j = 0; j < img.rows; j++)
-							{
-
-								Vec3b color1(0, 0, 0);
-								img.at< Vec3b>(Point(i, j)) = color1;
-
-							}
-						}*/
-
 		}
-
-		else
-		{
-			vector<Point> pt;
-			//A imagem não se encontra exatamente nos extremos mas  estão distantes
-			if (size > img.cols / 2)
+		else {
+			//Extremos de imagens
+			vector<Point>pts_Teste, points;
+			if (val.first->x == 0 && val.second->x == img.cols - 1)
 			{
+#pragma omp parallel for
 				for (int i = val.first->x; i < img.cols / 2; i++)
 				{
 					for (int j = 0; j < img.rows; j++)
 					{
 						if (img.at< Vec3b>(Point(i, j))[0] != 0 && img.at< Vec3b>(Point(i, j))[1] != 0 && img.at< Vec3b>(Point(i, j))[2] != 0) {
-							Point p;
-							p.x = i;	p.y = j;
-							pt.push_back(p);
+
+							Vec3b color1(0, 0, 0);
+							img.at< Vec3b>(Point(i, j)) = color1;
+						}
+					}
+				}
+
+
+				/*	vector<Point>pts_cols, points;
+					for (int i = val.second->x / 2; i < val.second->x; i++)
+					{
+						for (int j = 0; j < img.rows; j++)
+						{
+							if (img.at< Vec3b>(Point(i, j))[0] != 0 && img.at< Vec3b>(Point(i, j))[1] != 0 && img.at< Vec3b>(Point(i, j))[2] != 0) {
+								Point p;
+								p.x = i; p.y = j;
+								pts_cols.push_back(p);
+							}
+						}
+					}*/
+
+
+
+			}
+
+			else
+			{
+				vector<Point> pt;
+				//A imagem não se encontra exatamente nos extremos mas  estão distantes
+				if (size > img.cols / 2)
+				{
+					for (int i = val.first->x; i < img.cols / 2; i++)
+					{
+						for (int j = 0; j < img.rows; j++)
+						{
+							if (img.at< Vec3b>(Point(i, j))[0] != 0 && img.at< Vec3b>(Point(i, j))[1] != 0 && img.at< Vec3b>(Point(i, j))[2] != 0) {
+								Point p;
+								p.x = i;	p.y = j;
+								pt.push_back(p);
+
+							}
+						}
+					}
+					auto val4 = std::minmax_element(pt.begin(), pt.end(), findMinMaxRows);
+					int size2 = abs(val4.first->x - val4.second->x);
+#pragma omp parallel for
+					for (int i = val4.first->x + size2 / 2; i < val.second->x + 1; i++)
+					{
+						for (int j = 0; j < img.rows; j++)
+						{
+							Vec3b color1(0, 0, 0);
+							img.at< Vec3b>(Point(i, j)) = color1;
 
 						}
 					}
 				}
-				auto val4 = std::minmax_element(pt.begin(), pt.end(), findMinMaxRows);
-				int size2 = abs(val4.first->x - val4.second->x);
-#pragma omp parallel for
-				for (int i = val4.first->x + size2 / 2; i < val.second->x + 1; i++)
+				// Imagem normal sem ser cortada - pega um pouco mais da metade e tira;
+				else
 				{
-					for (int j = 0; j < img.rows; j++)
-					{
-						Vec3b color1(0, 0, 0);
-						img.at< Vec3b>(Point(i, j)) = color1;
-
-					}
-				}
-			}
-			// Imagem normal sem ser cortada - pega um pouco mais da metade e tira;
-			else
-			{
 #pragma omp parallel for
-				for (int i = val.first->x + size / 2 + 5; i < val.second->x + 1; i++)
-				{
-					for (int j = 0; j < img.rows; j++)
+					for (int i = val.first->x + size / 2 + 5; i < val.second->x + 1; i++)
 					{
+						for (int j = 0; j < img.rows; j++)
+						{
 
-						Vec3b color1(0, 0, 0);
-						img.at< Vec3b>(Point(i, j)) = color1;
+							Vec3b color1(0, 0, 0);
+							img.at< Vec3b>(Point(i, j)) = color1;
 
+						}
 					}
 				}
 			}
 		}
-		/*}*/
 
 	}
 
@@ -412,7 +383,7 @@ Mat multiband_blending(Mat a, const Mat b, int k, int qnt_images_linha) {
 
 	/////////////Contorno Parte comum
 	Mat src_gray3;
-	//src_gray3 = out;
+
 	cvtColor(out, src_gray3, CV_BGR2GRAY);
 	src_gray3.convertTo(src_gray3, CV_8UC3, 255);
 	Mat dst3(src_gray3.rows, src_gray3.cols, CV_8UC3, Scalar::all(0));
@@ -530,8 +501,6 @@ void dotsFilter(Mat &in) {
 	in.copyTo(temp);
 	// Varrer imagem de forma paralela, se achar ponto preto, tirar a media da vizinhanca nxn predefinida e trocar a cor do pixel
 
-
-
 	const int n = 3;
 	int cont = 0;
 #pragma omp parallel for
@@ -544,9 +513,8 @@ void dotsFilter(Mat &in) {
 
 			if (cor_atual[0] == 0 && cor_atual[1] == 0 && cor_atual[2] == 0)
 			{
-				//Media dos vizinhos
 				int r = 0, g = 0, b = 0;
-
+#pragma omp parallel for
 				for (int i = u - n; i < u + n; i++) {
 					for (int j = v - n; j < v + n; j++) {
 
@@ -559,7 +527,6 @@ void dotsFilter(Mat &in) {
 
 					}
 				}
-				//cor_atual[0] = r / pow(n - 1, 2); cor_atual[1] = g / pow(n - 1, 2); cor_atual[2] = b / pow(n - 1, 2);
 				cor_atual[0] = r; cor_atual[1] = g; cor_atual[2] = b;
 
 				//Altera somente na imagem de saida
@@ -574,7 +541,7 @@ void dotsFilter(Mat &in) {
 	temp.release();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void doTheThing(float sd, Vector3f p2, Vector3f p4, Vector3f p5, Vector3f pc, Mat im, Mat &img, Mat im360) {
+void doTheThing(float sd, Vector3f p2, Vector3f p4, Vector3f p5, Vector3f pc, Mat im, Mat im360) {
 	// A partir de frustrum, calcular a posicao de cada pixel da imagem fonte em XYZ, assim como quando criavamos o plano do frustrum
 	Vector3f hor_step, ver_step; // Steps pra se andar de acordo com a resolucao da imagem
 	hor_step = (p4 - p5) / float(im.cols);
@@ -601,45 +568,45 @@ void doTheThing(float sd, Vector3f p2, Vector3f p4, Vector3f p5, Vector3f pc, Ma
 				v = (v < 0) ? 0 : v;
 				// Pintar a imagem final com as cores encontradas
 				im360.at<Vec3b>(Point(u, v)) = im.at<Vec3b>(Point(j, im.rows - 1 - i));
-				img.at<Vec3b>(Point(u, v)) = im.at<Vec3b>(Point(j, im.rows - 1 - i));
+				//img.at<Vec3b>(Point(u, v)) = im.at<Vec3b>(Point(j, im.rows - 1 - i));
 
 			}
 
 		}
 	}
 }
-void ShowUsage() {
+void ShowUsage() 
+{
 	std::cout << "Run:" << std::endl;
 	std::cout << "panoramica.exe <path>" << std::endl
-		<<std::endl 
+		<< std::endl
 		<< "    path:   caminho do local onde o arquivo sfm e as imagens estao." << std::endl;
-		
-	
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-	
-	// Coisa do ros, apagar
-	/*ros::init(argc, argv, "otimiza_bat");
-	ros::NodeHandle nh;*/
+
 	/*char* arguments[] = { "--dir", "C:/Users/julia/Pictures/estacionamento/scan3" };
-	argc =2 ;
+	argc = 2;
 	argv = arguments;*/
-	//Localização arquivo NVM
+
+
+	//Verificando argumentos 
 	if (argc < 2)
 	{
 		ShowUsage();
 		return 0;
 	}
-	char* home;
-	home = getenv("HOME");
-
+	std::cout << "CAPPanoramica360 1.0.1" << endl;
+	//Localização arquivo NVM/SFM
 	std::string pasta = argv[1];
-	if (pasta.back()!= '/') {
+
+	if (pasta.back() != '/') {
 		pasta = pasta + '/';
 
-}
+	}
+	std::cout << "Carregando cameras" << endl;
 	std::string arquivo_nvm = pasta + "cameras.sfm";
 
 	ifstream nvm(arquivo_nvm);
@@ -650,7 +617,7 @@ int main(int argc, char **argv)
 	vector<std::string> nomes_imagens, linhas, linhas_organizadas;
 	std::string linha;
 	int flag = 0;
-	printf("Abrindo e lendo arquivo NVM ...\n");
+	//printf("Abrindo e lendo arquivo NVM ...\n");
 	if (arquivo_nvm.substr(arquivo_nvm.find_last_of(".") + 1) == "sfm")
 	{
 		flag = 1;
@@ -824,21 +791,21 @@ int main(int argc, char **argv)
 	//Panoramica para cada Linha
 	vector <Mat>  im360_parcial; im360_parcial.resize(8);
 	Mat anterior = Mat::zeros(Size(raios_360, raios_180), CV_8UC3);
-	Mat im360 = Mat::zeros(Size(raios_360, raios_180), CV_8UC3); // Imagem 360 ao final de todas as fotos passadas sem blending 
 	int contador = 0;
 
-	//ros::Time tempo = ros::Time::now();
+
 	/// Para cada imagem
 	auto start = chrono::steady_clock::now();
-	printf("Processando cada foto, sem print nenhum pra ir mais rapido ...\n");
+	std::cout << "Carregando Imagens" << endl;
+
 	for (int i = 0; i < nomes_imagens.size(); i++)
 	{
-		printf("Processando foto %d...\n", i + 1);
+		printf("   Processando foto %d...\n", i + 1);
 		// Ler a imagem a ser usada
 		Mat image = imread(nomes_imagens[i]);
-		imwrite("C:/dataset3/teste.jpg",image);
+
 		if (image.cols < 3)
-			cout << ("Imagem nao foi encontrada, checar NVM ...");
+			cout << ("Imagem nao foi encontrada, checar SFM ...");
 
 		// Calcular a vista da camera pelo Rt inverso - rotacionar para o nosso mundo, com Z para cima
 		Matrix4f T;
@@ -884,8 +851,8 @@ int main(int argc, char **argv)
 
 		// Fazer tudo aqui nessa nova funcao, ja devolver a imagem esferica inclusive nesse ponto
 		Mat imagem_esferica = Mat::zeros(Size(raios_360, raios_180), CV_8UC3);
-		doTheThing(step_deg, p2.block<3, 1>(0, 0), p4.block<3, 1>(0, 0), p5.block<3, 1>(0, 0), pCenter.block<3, 1>(0, 0), image, im360, imagem_esferica);
-		
+		doTheThing(step_deg, p2.block<3, 1>(0, 0), p4.block<3, 1>(0, 0), p5.block<3, 1>(0, 0), pCenter.block<3, 1>(0, 0), image, imagem_esferica);
+
 		//Tirar pontos pretos quando aumenta resolução
 		dotsFilter(imagem_esferica);
 
@@ -963,6 +930,7 @@ int main(int argc, char **argv)
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
 			im360_parcial[3] = multiband_blending(anterior, imagem_esferica, index, qnt_images_linha);
 			anterior = im360_parcial[3];
+
 			imagem_esferica.release();
 
 
@@ -999,6 +967,7 @@ int main(int argc, char **argv)
 			imagem_esferica.convertTo(imagem_esferica, CV_32F, 1.0 / 255.0);
 			im360_parcial[5] = multiband_blending(anterior, imagem_esferica, index, qnt_images_linha);
 			anterior = im360_parcial[5];
+
 			imagem_esferica.release();
 
 		}
@@ -1046,6 +1015,8 @@ int main(int argc, char **argv)
 	} // Fim do for imagens;
 
 	////Resultado Final - Juntando os blendings horizontais
+	std::cout << "Gerando imagem panoramica 360 final" << endl;
+
 	Mat result;
 	index = 1000;
 	result = im360_parcial[7];
@@ -1063,17 +1034,16 @@ int main(int argc, char **argv)
 		}
 	}
 
-	imwrite(pasta + "/imagem_esferica_Blending.png", result);
-	
+	imwrite(pasta + "imagem_Panoramica.png", result);
+
+	printf("Processo finalizado \n");
+
 	auto end = chrono::steady_clock::now();
 	auto diff = end - start;
 	cout << chrono::duration <double, milli>(diff).count() << " ms" << endl;
-	// Salvando imagem esferica final
-	imwrite(pasta + "/imagem_esferica_result.png", im360);
-	printf("Processo finalizado.");
+
+
 
 	return 0;
 
 }
-
-
