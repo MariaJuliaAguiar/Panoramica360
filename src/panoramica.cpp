@@ -587,9 +587,9 @@ void ShowUsage()
 int main(int argc, char **argv)
 {
 
-	/*char* arguments[] = { "--dir", "C:/Users/julia/Pictures/estacionamento/scan3" };
-	argc = 2;
-	argv = arguments;*/
+	//char* arguments[] = { "--dir", "C:/Users/julia/Pictures/estacionamento/scan5" };
+	//argc = 2;
+	//argv = arguments;
 
 
 	//Verificando argumentos 
@@ -606,6 +606,7 @@ int main(int argc, char **argv)
 		pasta = pasta + '/';
 
 	}
+	
 	std::cout << "Carregando cameras" << endl;
 	std::string arquivo_nvm = pasta + "cameras.sfm";
 
@@ -1034,7 +1035,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-	imwrite(pasta + "imagem_Panoramica.png", result);
+	int d = pasta.find_last_of('/') - 1;
+
+	imwrite(pasta + "scan"+ pasta.at(d)+"_panoramica.png", result);
 
 	printf("Processo finalizado \n");
 
