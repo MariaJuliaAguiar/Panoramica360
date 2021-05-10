@@ -5,11 +5,11 @@
 #include <sys/stat.h>
 #include <ostream>
 #include <chrono>
-
+#include <stdio.h>
+#include <sys/stat.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/io/ply_io.h>
-
-#include <dirent.h>
+#include <locale.h>
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -20,6 +20,7 @@
 #include <Eigen/Geometry>
 #include <Eigen/Dense>
 #include <Eigen/Core>
+
 
 //Definicoes e namespaces
 
@@ -575,38 +576,114 @@ void doTheThing(float sd, Vector3f p2, Vector3f p4, Vector3f p5, Vector3f pc, Ma
 		}
 	}
 }
-void ShowUsage() 
+
+static void show_usage(std::string name)
 {
-	std::cout << "Run:" << std::endl;
-	std::cout << "panoramica.exe <path>" << std::endl
-		<< std::endl
-		<< "    path:   caminho do local onde o arquivo sfm e as imagens estao." << std::endl;
+
+
+
+	std::cerr << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
+		<< "\n"
+		<< name.substr(name.find_last_of("\\") + 1, name.size()) << ": error: the following arguments are required : -root_path"
+
+		<< std::endl;
+}
+static void show_usage_root(std::string name)
+{
+
+
+
+	std::cerr << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
+		<< "\n"
+		<< name.substr(name.find_last_of("\\") + 1, name.size()) << ": error: argument -root_path: expected one argument"
+
+		<< std::endl;
+}
+static void show_help(std::string name, std::string version)
+{
+
+	std::cout << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
+		<< "\n" << std::endl;
+
+	std::cerr << "This is the CAP 360 Panoramic Image Estimator - " << version
+		<< ". It processes the final 360 panoramic image,\n"
+		<< "from the data acquired by the CAP scanner."
+
+		<< std::endl << std::endl;
+	std::cerr << "optinal arguments: \n"
+		<< "  -h, --help            show this help message and exit" << std::endl
+		<< "  -root_path ROOT_PATH  REQUIRED. Path for the project root." << std::endl
+		<< "                        \"ScanX\" folder with sfm file and images."
+		<< std::endl << std::endl;
+
+	std::cerr << "Fill the parameters accordingly.\n";
 
 }
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
+	//setlocale(LC_ALL, "");
+	
+	/*char* arguments[] = { "--dir", "-root_path","C:/Users/julia/Pictures/estacionamento/scan5" };
+	argc = 3;
+	argv = arguments;*/
 
-	//char* arguments[] = { "--dir", "C:/Users/julia/Pictures/estacionamento/scan5" };
-	//argc = 2;
-	//argv = arguments;
-
+	std::string version = "1.1.0";
 
 	//Verificando argumentos 
-	if (argc < 2)
+	if (argc >= 1)
 	{
-		ShowUsage();
-		return 0;
+
+		if (argc >= 2) {
+			std::string arg = argv[1];
+			if ((arg == "-h") || (arg == "--help")) {
+				show_help(argv[0], version);
+				return 0;
+			}
+			else if ((arg == "-root_path") && argc == 2) 
+			{
+				show_usage_root(argv[0]);
+				return 1;
+			}
+			else if ((arg != "-root_path") && argc == 2) {
+				cout << "aqui";
+				show_usage(argv[0]);
+
+				return 1;
+			}
+		}
+		
+		else if (argc < 3)
+		{
+			cout << "aqui 2";
+			show_usage(argv[0]);
+
+			return 1;
+		}
+		
 	}
-	std::cout << "CAPPanoramica360 1.0.1" << endl;
+
+	   	
+	
 	//Localização arquivo NVM/SFM
-	std::string pasta = argv[1];
+	std::string pasta = argv[2];
 
 	if (pasta.back() != '/') {
 		pasta = pasta + '/';
 
 	}
 	
+	if (access(pasta.c_str(), 0) != 0)
+	{
+	
+		cout << " O sistema não pode encontrar o caminho especificado: "<< pasta << endl;
+		return 0;
+	}
+
+
+	std::cout << "CAP 360 Panoramic Image Estimator - v"<< version << endl;
+
 	std::cout << "Carregando cameras" << endl;
 	std::string arquivo_nvm = pasta + "cameras.sfm";
 
@@ -631,7 +708,7 @@ int main(int argc, char **argv)
 			}
 		}
 		else {
-			printf("Arquivo de cameras nao encontrado. Desligando ...\n");
+			printf("Arquivo de cameras nao encontrado. \n");
 			return 0;
 		}
 	}
@@ -646,7 +723,7 @@ int main(int argc, char **argv)
 			}
 		}
 		else {
-			printf("Arquivo de cameras nao encontrado. Desligando ...\n");
+			printf("Arquivo de cameras nao encontrado. \n");
 			return 0;
 		}
 	}
@@ -806,7 +883,7 @@ int main(int argc, char **argv)
 		Mat image = imread(nomes_imagens[i]);
 
 		if (image.cols < 3)
-			cout << ("Imagem nao foi encontrada, checar SFM ...");
+			cout << ("Imagem nao foi encontrada, por favor checar SFM e imagens ...");
 
 		// Calcular a vista da camera pelo Rt inverso - rotacionar para o nosso mundo, com Z para cima
 		Matrix4f T;
@@ -1039,13 +1116,13 @@ int main(int argc, char **argv)
 
 	imwrite(pasta + "scan"+ pasta.at(d)+"_panoramica.png", result);
 
-	printf("Processo finalizado \n");
+	
 
 	auto end = chrono::steady_clock::now();
 	auto diff = end - start;
 	cout << chrono::duration <double, milli>(diff).count() << " ms" << endl;
 
-
+	printf("Processo finalizado \n");
 
 	return 0;
 
