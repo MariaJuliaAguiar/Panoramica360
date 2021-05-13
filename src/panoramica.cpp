@@ -629,7 +629,7 @@ int main(int argc, char **argv)
 	argc = 3;
 	argv = arguments;*/
 
-	std::string version = "1.1.0";
+	std::string version = "1.2.0";
 
 	//Verificando argumentos 
 	if (argc >= 1)
