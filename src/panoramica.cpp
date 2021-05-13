@@ -582,41 +582,41 @@ static void show_usage(std::string name)
 
 
 
-	std::cerr << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
+	std::cout << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
 		<< "\n"
 		<< name.substr(name.find_last_of("\\") + 1, name.size()) << ": error: the following arguments are required : -root_path"
 
-		<< std::endl;
+		<< std::endl << std::flush;
 }
 static void show_usage_root(std::string name)
 {
 
 
 
-	std::cerr << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
+	std::cout << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
 		<< "\n"
 		<< name.substr(name.find_last_of("\\") + 1, name.size()) << ": error: argument -root_path: expected one argument"
 
-		<< std::endl;
+		<< std::endl << std::flush;
 }
 static void show_help(std::string name, std::string version)
 {
 
 	std::cout << std::endl << "usage: " << name.substr(name.find_last_of("\\") + 1, name.size()) << " [-h] -root_path ROOT_PATH"
-		<< "\n" << std::endl;
+		<< "\n" <<  std::flush << std::endl;
 
-	std::cerr << "This is the CAP 360 Panoramic Image Estimator - " << version
+	std::cout << "This is the CAP 360 Panoramic Image Estimator - " << version
 		<< ". It processes the final 360 panoramic image,\n"
 		<< "from the data acquired by the CAP scanner."
 
-		<< std::endl << std::endl;
-	std::cerr << "optinal arguments: \n"
+		<< std::endl << std::endl << std::flush  ;
+	std::cout << "optinal arguments: \n"
 		<< "  -h, --help            show this help message and exit" << std::endl
 		<< "  -root_path ROOT_PATH  REQUIRED. Path for the project root." << std::endl
 		<< "                        \"ScanX\" folder with sfm file and images."
-		<< std::endl << std::endl;
+		<< std::endl << std::endl << std::flush;
 
-	std::cerr << "Fill the parameters accordingly.\n";
+	std::cout << "Fill the parameters accordingly.\n"<<std::flush;
 
 }
 
@@ -647,7 +647,7 @@ int main(int argc, char **argv)
 				return 1;
 			}
 			else if ((arg != "-root_path") && argc == 2) {
-				cout << "aqui";
+				
 				show_usage(argv[0]);
 
 				return 1;
@@ -656,7 +656,7 @@ int main(int argc, char **argv)
 		
 		else if (argc < 3)
 		{
-			cout << "aqui 2";
+			
 			show_usage(argv[0]);
 
 			return 1;
@@ -677,14 +677,14 @@ int main(int argc, char **argv)
 	if (access(pasta.c_str(), 0) != 0)
 	{
 	
-		cout << " O sistema não pode encontrar o caminho especificado: "<< pasta << endl;
+		cout << " O sistema não pode encontrar o caminho especificado: "<< pasta << std::flush << std::endl;
 		return 0;
 	}
 
 
-	std::cout << "CAP 360 Panoramic Image Estimator - v"<< version << endl;
+	std::cout << "CAP 360 Panoramic Image Estimator - v"<< version << std::flush << std::endl;
 
-	std::cout << "Carregando cameras" << endl;
+	std::cout << "Carregando cameras" << std::flush << std::endl;
 	std::string arquivo_nvm = pasta + "cameras.sfm";
 
 	ifstream nvm(arquivo_nvm);
@@ -708,7 +708,7 @@ int main(int argc, char **argv)
 			}
 		}
 		else {
-			printf("Arquivo de cameras nao encontrado. \n");
+			cout<<"Arquivo de cameras nao encontrado. \n" << std::flush;
 			return 0;
 		}
 	}
@@ -723,7 +723,7 @@ int main(int argc, char **argv)
 			}
 		}
 		else {
-			printf("Arquivo de cameras nao encontrado. \n");
+			cout<<"Arquivo de cameras nao encontrado. \n" << std::flush;
 			return 0;
 		}
 	}
@@ -873,17 +873,19 @@ int main(int argc, char **argv)
 
 
 	/// Para cada imagem
-	auto start = chrono::steady_clock::now();
-	std::cout << "Carregando Imagens" << endl;
+	auto start_time_ssa = std::chrono::high_resolution_clock::now();
+	std::cout << "Carregando Imagens" << endl << std::flush;
 
 	for (int i = 0; i < nomes_imagens.size(); i++)
 	{
-		printf("   Processando foto %d...\n", i + 1);
+		cout<<"   Processando foto  "<< nomes_imagens[i] << endl << std::flush;
 		// Ler a imagem a ser usada
 		Mat image = imread(nomes_imagens[i]);
 
-		if (image.cols < 3)
-			cout << ("Imagem nao foi encontrada, por favor checar SFM e imagens ...");
+		if (image.cols < 3) {
+			cout << ("Imagem nao foi encontrada, por favor checar SFM e imagens ...") << std::flush;
+			return 0;
+		}
 
 		// Calcular a vista da camera pelo Rt inverso - rotacionar para o nosso mundo, com Z para cima
 		Matrix4f T;
@@ -934,7 +936,7 @@ int main(int argc, char **argv)
 		//Tirar pontos pretos quando aumenta resolução
 		dotsFilter(imagem_esferica);
 
-		////Começa o blending
+		//////Começa o blending
 		if (i == 0) {
 
 			anterior.release();
@@ -1093,7 +1095,7 @@ int main(int argc, char **argv)
 	} // Fim do for imagens;
 
 	////Resultado Final - Juntando os blendings horizontais
-	std::cout << "Gerando imagem panoramica 360 final" << endl;
+	std::cout << endl << "Gerando imagem panoramica 360 final " << endl << endl << std::flush;
 
 	Mat result;
 	index = 1000;
@@ -1118,11 +1120,12 @@ int main(int argc, char **argv)
 
 	
 
-	auto end = chrono::steady_clock::now();
-	auto diff = end - start;
-	cout << chrono::duration <double, milli>(diff).count() << " ms" << endl;
+	auto finish_time_ssa = std::chrono::high_resolution_clock::now();
+	
+	//cout << std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time_ssa - start_time_ssa).count() * 1e-9 << " seg" << endl << std::flush;
 
-	printf("Processo finalizado \n");
+	cout<<"Processo finalizado em  "<< std::chrono::duration_cast<std::chrono::nanoseconds>(finish_time_ssa - start_time_ssa).count() * 1e-9 << " segundos, "
+		<<"salvo em " << pasta << endl<<std::flush;
 
 	return 0;
 
