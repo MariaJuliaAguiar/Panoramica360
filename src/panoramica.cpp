@@ -624,12 +624,12 @@ static void show_help(std::string name, std::string version)
 int main(int argc, char **argv)
 {
 	//setlocale(LC_ALL, "");
-	
-	/*char* arguments[] = { "--dir", "-root_path","C:/Users/julia/Pictures/estacionamento/scan5" };
+	/*
+	char* arguments[] = { "--dir", "-root_path","C:/Users/julia/Pictures/estacionamento/scan5" };
 	argc = 3;
 	argv = arguments;*/
 
-	std::string version = "1.2.0";
+	std::string version = "1.2.1";
 
 	//Verificando argumentos 
 	if (argc >= 1)
@@ -1117,7 +1117,8 @@ int main(int argc, char **argv)
 	int d = pasta.find_last_of('/') - 1;
 
 	imwrite(pasta + "scan"+ pasta.at(d)+"_panoramica.png", result);
-
+	cv::resize(result, result, cv::Size(2048, 1024), 0, 0, CV_INTER_LINEAR);
+	imwrite(pasta + "scan" + pasta.at(d) + "_panoramica_site.jpg", result);
 	
 
 	auto finish_time_ssa = std::chrono::high_resolution_clock::now();
