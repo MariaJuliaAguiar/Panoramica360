@@ -629,7 +629,7 @@ int main(int argc, char **argv)
 	argc = 3;
 	argv = arguments;*/
 
-	std::string version = "1.2.1";
+	std::string version = "1.2.2";
 
 	//Verificando argumentos 
 	if (argc >= 1)
@@ -1117,7 +1117,8 @@ int main(int argc, char **argv)
 	int d = pasta.find_last_of('/') - 1;
 
 	imwrite(pasta + "scan"+ pasta.at(d)+"_panoramica.png", result);
-	cv::resize(result, result, cv::Size(2048, 1024), 0, 0, CV_INTER_LINEAR);
+
+	cv::resize(result, result, cv::Size(result.cols*0.90, result.rows*0.9), 0, 0, INTER_NEAREST);
 	imwrite(pasta + "scan" + pasta.at(d) + "_panoramica_site.jpg", result);
 	
 
